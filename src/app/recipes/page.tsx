@@ -1,9 +1,7 @@
+import Recipes from '@/Components/Recipes/Recipes';
+
 const Page: React.FC = () => {
-    return (
-        <div>
-            <h1>Recipes</h1>
-            <p>Coming soon...</p>
-        </div>
-    );
+    return <Recipes />;
 };
+
 export default Page;

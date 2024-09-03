@@ -3,6 +3,7 @@ import './globals.scss';
 import ss from './layout.module.scss';
 import Header from '@/Layout/Header/Header';
 import Nav from '@/Layout/Nav/Nav';
+import {RecipeProvider} from '@/Context/RecipeContext/RecipeContext';
 
 export const metadata: Metadata = {
     title: 'Create Next App',
@@ -17,11 +18,13 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <div className={ss.container}>
-                    <Header />
-                    <div className={ss.content}>{children}</div>
-                    <Nav />
-                </div>
+                <RecipeProvider>
+                    <div className={ss.container}>
+                        <Header />
+                        <div className={ss.content}>{children}</div>
+                        <Nav />
+                    </div>
+                </RecipeProvider>
             </body>
         </html>
     );

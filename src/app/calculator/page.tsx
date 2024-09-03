@@ -1,10 +1,7 @@
+import Calculator from '@/Components/Calculator/Calculator';
+
 const Page: React.FC = () => {
-    return (
-        <div>
-            <h1>Calculator</h1>
-            <p>Coming soon...</p>
-        </div>
-    );
+    return <Calculator />;
 };
 
 export default Page;

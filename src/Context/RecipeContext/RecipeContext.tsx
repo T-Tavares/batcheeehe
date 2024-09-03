@@ -35,28 +35,28 @@ export const RecipeProvider: React.FC<{children: React.ReactNode}> = ({children}
     // -------------- RECALCULATE RECIPE -------------- //
     const recalculateRecipe = (ingredient: string, inputedAmount: number) => {
         let factor: number;
+        const originalRecipe = allRecipes.find(r => r.name === currentRecipe.name)!;
 
         // GET FACTOR FOR RECALCULATION
-
         if (ingredient === 'Total') {
-            const totalQuantity = currentRecipe.ingredients.reduce((acc, curr) => acc + curr.quantity, 0);
+            const totalQuantity = originalRecipe.ingredients.reduce((acc, curr) => acc + curr.quantity, 0);
             factor = +(inputedAmount / totalQuantity).toFixed(2);
         } else {
-            const recipeIngredientQuantity = currentRecipe.ingredients.find(ingd => ingd.name === ingredient)!.quantity;
+            const recipeIngredientQuantity = originalRecipe.ingredients.find(ingd => ingd.name === ingredient)!.quantity;
             factor = +(inputedAmount / recipeIngredientQuantity).toFixed(2);
         }
 
         // RECALCULATE INGREDIENTS
-        const recalculatedIngredients = currentRecipe.ingredients.map(ingredient => {
+        const recalculatedIngredients = originalRecipe.ingredients.map(ingredient => {
             return {
                 ...ingredient,
-                quantity: Math.round(ingredient.quantity * factor),
+                quantity: Math.trunc(ingredient.quantity * factor),
             };
         });
 
         // SET CURRENT RECIPE TO NEW RECALCULATED RECIPE
 
-        setCurrentRecipe({...currentRecipe, ingredients: recalculatedIngredients});
+        setCurrentRecipe({...originalRecipe, ingredients: recalculatedIngredients});
     };
 
     return (

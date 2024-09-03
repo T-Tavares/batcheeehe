@@ -1,0 +1,9 @@
+@import './variables.scss';
+
+.container {
+    height: 100dvh;
+    width: 100dvw;
+
+    display: grid;
+    grid-template-rows: minmax(50px, auto) 1fr 60px;
+}

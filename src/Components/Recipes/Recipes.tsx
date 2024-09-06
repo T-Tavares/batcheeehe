@@ -2,8 +2,8 @@ import ss from './Recipes.module.scss';
 
 const Recipes: React.FC = () => {
     return (
-        <div>
-            <h1>Recipes</h1>
+        <div className={ss.recipes}>
+            <h1>Admin Access Required</h1>
         </div>
     );
 };

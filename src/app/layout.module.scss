@@ -5,5 +5,9 @@
     width: 100dvw;
 
     display: grid;
-    grid-template-rows: minmax(50px, auto) 1fr 60px;
+    grid-template-rows: 1fr 60px;
+
+    .content {
+        padding: 2rem 1rem;
+    }
 }

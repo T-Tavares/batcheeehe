@@ -1,9 +1,11 @@
 'use client';
 
-import {createContext, use, useContext, useState} from 'react';
+import {createContext, use, useContext, useEffect, useState} from 'react';
 import {recipes} from '@/../public/recipes';
 import type {Recipe, RecipesDatabase} from '@/../public/recipes';
-import {log} from 'console';
+import {get5000mlRecipe, getTotalQuantity, getRecipeIngredientQuantity} from '@/Utilities/Helpers';
+
+// ----------------- RECIPE CONTEXT PLACEHOLDERS ------------------ //
 
 const RecipeContext = createContext({
     currentRecipe: {} as Recipe,
@@ -17,46 +19,64 @@ const RecipeContext = createContext({
     },
 });
 
+// -------------------- RECIPE CONTEXT EXPORT --------------------- //
+
 export const useRecipe = () => useContext(RecipeContext);
 
-export const RecipeProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-    const allRecipes = recipes; // GET ALL RECIPES
-    const recipeInit = allRecipes[0]; // GET FIRST RECIPE
-    const [currentRecipe, setCurrentRecipe] = useState(recipeInit as Recipe); // STATE FOR CURRENT RECIPE
-    const recipesList = allRecipes.map(r => r.name); // GETS LIST OF RECIPES NAMES
+// ------------------- RECIPE CONTEXT PROVIDER -------------------- //
 
-    // ---------- SET CURRENT RECIPE HANDLER ---------- //
+export const RecipeProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+    // .                                                              . //
+    // --------------------- RECIPES CONTEXT INIT --------------------- //
+
+    const allRecipes = recipes; //                                                   GET ALL RECIPES
+    const recipeInit = get5000mlRecipe(allRecipes[0]); //                            GET FIRST RECIPE
+    const [currentRecipe, setCurrentRecipe] = useState(recipeInit as Recipe); //     STATE FOR CURRENT RECIPE
+    const recipesList = allRecipes.map(r => r.name); //                              GETS LIST OF RECIPES NAMES
+
+    // ------------------ SET CURRENT RECIPE HANDLER ------------------ //
 
     const setCurrentRecipeHandler = (recipe: string) => {
         const selectedRecipe = allRecipes.filter((r: Recipe) => r.name === recipe);
-        setCurrentRecipe(selectedRecipe[0]);
+        setCurrentRecipe(get5000mlRecipe(selectedRecipe[0]));
     };
 
-    // -------------- RECALCULATE RECIPE -------------- //
+    // ---------------------- RECALCULATE RECIPE ---------------------- //
+
     const recalculateRecipe = (ingredient: string, inputedAmount: number) => {
         let factor: number;
         const originalRecipe = allRecipes.find(r => r.name === currentRecipe.name)!;
 
-        // GET FACTOR FOR RECALCULATION
+        // ----------------- GET FACTOR FOR RECALCULATION ----------------- //
+
         if (ingredient === 'Total') {
-            const totalQuantity = originalRecipe.ingredients.reduce((acc, curr) => acc + curr.quantity, 0);
-            factor = +(inputedAmount / totalQuantity).toFixed(2);
+            const totalQuantity = getTotalQuantity(originalRecipe);
+            factor = inputedAmount / totalQuantity;
         } else {
-            const recipeIngredientQuantity = originalRecipe.ingredients.find(ingd => ingd.name === ingredient)!.quantity;
-            factor = +(inputedAmount / recipeIngredientQuantity).toFixed(2);
+            const recipeIngredientQuantity = getRecipeIngredientQuantity(originalRecipe, ingredient);
+            factor = inputedAmount / recipeIngredientQuantity;
         }
 
-        // RECALCULATE INGREDIENTS
+        /*  
+            --------------- ROUND FACTOR TO A MULTIPLE OF 5 ---------------- 
+        
+            This will assure that the recalculated recipe will have all values multiple of 5.
+            That will make it easier to batch with the bar equipment.
+        */
+        factor = factor - (factor % 2);
+
+        // ------------------- RECALCULATE INGREDIENTS -------------------- //
+
         const recalculatedIngredients = originalRecipe.ingredients.map(ingredient => {
             return {
                 ...ingredient,
-                quantity: Math.trunc(ingredient.quantity * factor),
+                quantity: ingredient.quantity * factor,
             };
         });
 
-        // SET CURRENT RECIPE TO NEW RECALCULATED RECIPE
+        // -------- SET CURRENT RECIPE TO NEW RECALCULATED RECIPE --------- //
 
-        setCurrentRecipe({...originalRecipe, ingredients: recalculatedIngredients});
+        setCurrentRecipe(prev => ({...prev, ingredients: recalculatedIngredients}));
     };
 
     return (

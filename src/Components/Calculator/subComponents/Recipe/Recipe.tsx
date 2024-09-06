@@ -1,19 +1,17 @@
 import ss from './Recipe.module.scss';
 import type {Recipe} from '@/../public/recipes';
 import IngredientRow from '../IngredientRow/IngredientRow';
+import {getTotalQuantity} from '@/Utilities/Helpers';
 
 const Recipe: React.FC<{recipe: Recipe}> = ({recipe}) => {
-    // GETS TOTAL QUANTITY OF RECIPY
-    const total = recipe.ingredients.reduce((acc, curr) => {
-        return acc + curr.quantity;
-    }, 0);
+    const total = getTotalQuantity(recipe);
 
     return (
         <div className={ss.recipe}>
             {recipe.ingredients.map(ingredient => (
-                <IngredientRow key={ingredient.name} ingredient={ingredient} />
+                <IngredientRow key={`${recipe.name}-${ingredient.name}`} ingredient={ingredient} />
             ))}
-            <IngredientRow ingredient={{name: 'Total', quantity: total, unity: 'ml'}} />
+            <IngredientRow key={`${recipe.name}-total`} ingredient={{name: 'Total', quantity: total, unity: 'ml'}} />
         </div>
     );
 };

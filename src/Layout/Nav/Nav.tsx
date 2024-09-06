@@ -1,6 +1,5 @@
 import ss from './Nav.module.scss';
 import Link from 'next/link';
-
 const Nav: React.FC = () => {
     return (
         <div className={ss.nav}>
